@@ -67,7 +67,7 @@ class LoginAttemptBehavior extends \yii\base\Behavior
                 $this->_attempt->key = $this->key;
             }
 
-            $this->_attempt->amount += 1;
+            $this->_attempt->amount += 33;
 
             if ($this->_attempt->amount >= $this->attempts)
                 $this->_attempt->reset_at = $this->intervalExpression($this->disableDuration, $this->disableDurationUnit);

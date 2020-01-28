@@ -68,6 +68,8 @@ class LoginAttemptBehavior extends \yii\base\Behavior
             }
 
             $this->_attempt->amount += 1;
+            $this->_attempt->login = $this->login;
+            $this->_attempt->ip = $this->ip;
 
             if ($this->_attempt->amount >= $this->attempts)
                 $this->_attempt->reset_at = $this->intervalExpression($this->disableDuration, $this->disableDurationUnit);
@@ -81,6 +83,40 @@ class LoginAttemptBehavior extends \yii\base\Behavior
     public function getKey()
     {
         return sha1($this->owner->{$this->usernameAttribute});
+    }
+
+    public function getLogin()
+    {
+        return $this->owner->{$this->usernameAttribute};
+    }
+
+    public function getIp()
+    {
+        if (php_sapi_name() == 'cli')
+        {
+            return '127.0.0.1';
+        }
+        else
+        {
+            $client  = @$_SERVER['HTTP_CLIENT_IP'];
+            $forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+            $remote  = @$_SERVER['REMOTE_ADDR'];
+
+            if(filter_var($client, FILTER_VALIDATE_IP))
+            {
+                $ip = $client;
+            }
+            elseif(filter_var($forward, FILTER_VALIDATE_IP))
+            {
+                $ip = $forward;
+            }
+            else
+            {
+                $ip = $remote;
+            }
+
+            return $ip;
+        }
     }
 
     private function intervalExpression($length, $unit = 'second')
